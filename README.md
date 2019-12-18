@@ -11,7 +11,7 @@ It is then just a case of running the `perform_analysis.sh` script.
 
 The Python script requires the following modules to be installed
 
-    cv2 (OpenCV)
+    opencv-python
     piexif
     GPy
     numpy
