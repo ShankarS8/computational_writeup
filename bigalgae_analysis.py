@@ -5,7 +5,7 @@ import numpy
 import GPy
 
 def get_algae_window(image_filepath):
-    img = cv2.imread(image_filepath, cv2.CV_LOAD_IMAGE_COLOR)
+    img = cv2.imread(image_filepath, cv2.IMREAD_COLOR)
     width, height, channels = img.shape
     thresh_img, contours, hierarchy = bigalgae.threshold_image(img, 21)
     algae_window_img = bigalgae.extract_algae_window(contours, hierarchy, img,
@@ -59,10 +59,10 @@ def return_central_window_dict(cropped_algae_window_image):
     return_dict['red'] = red_ref
     return(return_dict)
 
-def return_prediction(photo, calibration_parameters, max_samples, seed, 
+def return_prediction(photo, calibration_parameters, max_samples, seed,
                       wip_image_output_filepath=None):
     sample_strip = get_algae_window(photo)
-    if sample_strip == None:
+    if type(sample_strip) != numpy.ndarray or (sample_strip == None).any():
         return(None, None)
     else:
         # Get algae window
@@ -102,13 +102,13 @@ def return_prediction(photo, calibration_parameters, max_samples, seed,
                                 colour]['mean'],
                             scale=calibration_parameters['green_cal'][
                                 colour]['sd'],
-                            size=len(sample_dict['green_cal']['x'])),                           
+                            size=len(sample_dict['green_cal']['x'])),
                         numpy.random.normal(
                             loc=calibration_parameters['red_cal'][
                                 colour]['mean'],
                             scale=calibration_parameters['red_cal'][
                                 colour]['sd'],
-                            size=len(sample_dict['red_cal']['x'])),                           
+                            size=len(sample_dict['red_cal']['x'])),
                         numpy.random.normal(
                             loc=calibration_parameters['black_cal'][
                                 colour]['mean'],
@@ -127,7 +127,7 @@ def return_prediction(photo, calibration_parameters, max_samples, seed,
             gpy_mean, gpy_var = model.predict(X_test)
             mean_metalist.append(gpy_mean)
             sd_metalist.append(numpy.sqrt(gpy_var))
-        return_dict = {'mean': numpy.column_stack(mean_metalist), 
+        return_dict = {'mean': numpy.column_stack(mean_metalist),
                     'sd': numpy.column_stack(sd_metalist)}
         if not wip_image_output_filepath is None:
             del(X, y)
