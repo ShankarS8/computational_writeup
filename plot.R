@@ -16,12 +16,15 @@ picture_information_500 <- picture_information[
 
 training_data <- cbind(training_data, picture_information_500[
     match(training_data$file_name, picture_information_500$file_name),])
-training_data$od_680_mean <- apply(training_data[,
+training_data$od_600_mean <- apply(training_data[,
+    grepl('od_600', names(training_data))], 1, mean, na.rm=TRUE)
+# training_data$od_680_mean <- apply(training_data[,
     grepl('od_680', names(training_data))], 1, mean, na.rm=TRUE)
-training_data$od_750_mean <- apply(training_data[,
+# training_data$od_750_mean <- apply(training_data[,
     grepl('od_750', names(training_data))], 1, mean, na.rm=TRUE)
 
-measures <- c('cell_concentration_g_per_l', 'cells_per_ml', 'od_680_mean',
+measures <- c('cells_per_ml', 'od_600_mean')
+# measures <- c('cell_concentration_g_per_l', 'cells_per_ml', 'od_680_mean',
     'od_750_mean')
 training_data_long <- training_data[,c(1:5, 17:22,
     which(names(training_data) %in% measures))]
@@ -31,8 +34,9 @@ training_data_long <- separate(training_data_long, colour,
     into=c('colour', 'type'), sep='_')
 training_data_long <- spread(training_data_long, type, colour_value)
 colnames(training_data_long)[match(measures, colnames(training_data_long))] <-
-    c('Cell Concentration (g/l)', 'Cell Density (cells / ml)', 'OD 680nm',
+    # c('Cell Concentration (g/l)', 'Cell Density (cells / ml)', 'OD 680nm',
     'OD 750nm')
+    c('Cell Density (cells / ml)', 'OD 600nm')
 training_data_long <- gather(training_data_long, measurement_type, measurement,
     -(file_name:day), -(colour:sd))
 training_data_long$colour <- c('Blue', 'Green', 'Red')[
